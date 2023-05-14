@@ -1,0 +1,5 @@
+pvs_traning_segs/
+
+#Ignore
+*.nii.gz
+/__pycache__
