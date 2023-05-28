@@ -9,19 +9,20 @@ class PVSCreator():
 
     def __init__(self):
         
-        self.x = 0
-        self.y = 0
-        self.z = 0
-        self.x_vals = 0
-        self.y_vals = 0
-        self.z_vals = 0
-        self.voxelarray = 0
-        self.colors = 0
-        self.ax = 0
-        self.interpolant = 0
-        self.sampling_points = 0
-        self.pvs_rotated = 0
+        self.x = None
+        self.y = None
+        self.z = None
+        self.x_vals = None
+        self.y_vals = None
+        self.z_vals = None
+        self.voxelarray = None
+        self.colors = None
+        self.ax = None
+        self.interpolant = None
+        self.sampling_points = None
+        self.pvs_rotated = None
 
+    ## Create a PVS (Perivascular Space)
     def createPVS(self, NVox):
         
         # New -- from PSVDRO --
@@ -35,10 +36,10 @@ class PVSCreator():
         self.x, self.y, self.z = np.meshgrid(self.x_vals, self.y_vals, self.z_vals, indexing='ij')
 
         # Params for cuboids
-        size1 = randint(2, 3)  # think of this as the cuboid size1
-        size2 = randint(2, 3)  # think of this as the cuboid size2
-        size3 = randint(2, 3)  # think of this as the cuboid size3
-        size4 = randint(2, 3)  # think of this as the cuboid size4
+        size1 = randint(1, 2)  # think of this as the cuboid size1
+        size2 = randint(1, 2)  # think of this as the cuboid size2
+        size3 = randint(1, 2)  # think of this as the cuboid size3
+        size4 = randint(1, 2)  # think of this as the cuboid size4
 
         # Create 4 cuboids
         cube1 = ((self.x > size1) & (self.x <= 2*size1) & (self.y > size1) & (self.y <= 2*size1) & (self.z <= size1))
@@ -121,10 +122,18 @@ class PVSAdder():
             pvsC.rotatePVS()
             pvs = pvsC.numpy_array()
             
-            # Choice a random region and add a PVS
-            random_index = np.random.choice(len(indices))
-            i, j, k = indices[random_index]
-            img[i:i+16, j:j+16, k:k+16] = 69*(pvs>0) + np.multiply(img[i:i+16, j:j+16, k:k+16], pvs==0)
+            valid_index = False
+
+            while not valid_index:
+
+                # Choice a random region and add a PVS
+                random_index = np.random.choice(len(indices))
+                i, j, k = indices[random_index]
+
+                # This step is necessary to make sure the PVS is inside the ROI
+                if np.any(img[i:i+16, j:j+16, k:k+16] == img[i, j, k]):
+                    img[i:i+16, j:j+16, k:k+16] = 69*(pvs>0) + np.multiply(img[i:i+16, j:j+16, k:k+16], pvs==0)
+                    valid_index = True
 
         # Create the Nifti image
         affine = img_nii.affine                                                # Same affine transform
