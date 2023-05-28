@@ -96,8 +96,8 @@ class PVSCreator():
 class PVSAdder():
     
     def __init__(self):
-        self.atlas = 0
-        self.pvs = 0    
+        self.atlas = None
+        self.pvs = None
 
     def addPVS(self, atlas, result_dir, n, p):
         img_nii = nib.load(atlas)
