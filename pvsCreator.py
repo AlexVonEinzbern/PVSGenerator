@@ -103,11 +103,24 @@ class PVSAdder():
         img_nii = nib.load(atlas)
         img = img_nii.get_fdata()
 
-        # PVS_rois = [2, 10, 11, 12, 13, 16, 17, 18, 26, 41, 49, 50, 51, 52, 53, 54, 58]
-        indices = np.argwhere((img == 2) | (img == 10) | (img == 11) | (img == 12) | (img == 13)
-                      | (img == 16) | (img == 17) | (img == 18) | (img == 26) | (img == 41)
-                      | (img == 49) | (img == 50) | (img == 51) | (img == 52) | (img == 53)
-                      | (img == 54) | (img == 58))
+        # Get the indices of the regions of interest
+        indices = np.argwhere((img == 2)  |         # Lateral cerebral white matter
+                              (img == 10) |         # Left thalamus
+                              (img == 11) |         # Left caudate
+                              (img == 12) |         # Left putamen
+                              (img == 13) |         # Left pallidum
+                              (img == 16) |         # Brainstem
+                              (img == 17) |         # Left hippocampus
+                              (img == 18) |         # Left amygdala
+                              (img == 26) |         # Left accumbens
+                              (img == 41) |         # Right crebral white matter
+                              (img == 49) |         # Right thalamus
+                              (img == 50) |         # Right caudate
+                              (img == 51) |         # Right putamen
+                              (img == 52) |         # Right pallidum
+                              (img == 53) |         # Right hippocampus
+                              (img == 54) |         # Right amygdala
+                              (img == 58))          # Right accumbens
 
         # Number of pvs between 20 and 100
         num_pvs = np.random.randint(low=20, high=100)
