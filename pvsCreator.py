@@ -102,25 +102,26 @@ class PVSAdder():
     def addPVS(self, atlas, result_dir, n, p):
         img_nii = nib.load(atlas)
         img = img_nii.get_fdata()
+        valid = ((img == 2)  |          # Lateral cerebral white matter
+                 (img == 10) |          # Left thalamus
+                 (img == 11) |          # Left caudate
+                 (img == 12) |          # Left putamen
+                 (img == 13) |          # Left pallidum
+                 (img == 16) |          # Brainstem
+                 (img == 17) |          # Left hippocampus
+                 (img == 18) |          # Left amygdala
+                 (img == 26) |          # Left accumbens
+                 (img == 41) |          # Right crebral white matter
+                 (img == 49) |          # Right thalamus
+                 (img == 50) |          # Right caudate
+                 (img == 51) |          # Right putamen
+                 (img == 52) |          # Right pallidum
+                 (img == 53) |          # Right hippocampus
+                 (img == 54) |          # Right amygdala
+                 (img == 58))           # Right accumbens
 
         # Get the indices of the regions of interest
-        indices = np.argwhere((img == 2)  |         # Lateral cerebral white matter
-                              (img == 10) |         # Left thalamus
-                              (img == 11) |         # Left caudate
-                              (img == 12) |         # Left putamen
-                              (img == 13) |         # Left pallidum
-                              (img == 16) |         # Brainstem
-                              (img == 17) |         # Left hippocampus
-                              (img == 18) |         # Left amygdala
-                              (img == 26) |         # Left accumbens
-                              (img == 41) |         # Right crebral white matter
-                              (img == 49) |         # Right thalamus
-                              (img == 50) |         # Right caudate
-                              (img == 51) |         # Right putamen
-                              (img == 52) |         # Right pallidum
-                              (img == 53) |         # Right hippocampus
-                              (img == 54) |         # Right amygdala
-                              (img == 58))          # Right accumbens
+        indices = np.argwhere(valid)          # Right accumbens
 
         # Number of pvs between 20 and 100
         num_pvs = np.random.randint(low=20, high=100)
@@ -135,22 +136,17 @@ class PVSAdder():
             pvsC.rotatePVS()
             pvs = pvsC.numpy_array()
             
-            valid_index = False
+            # Choice a random region and add a PVS
+            random_index = np.random.choice(len(indices))
+            i, j, k = indices[random_index]
 
-            while not valid_index:
-
-                # Choice a random region and add a PVS
-                random_index = np.random.choice(len(indices))
-                i, j, k = indices[random_index]
-
-                # This step is necessary to make sure the PVS is inside the ROI
-                if np.any(img[i:i+16, j:j+16, k:k+16] == img[i, j, k]):
-                    img[i:i+16, j:j+16, k:k+16] = 69*(pvs>0) + np.multiply(img[i:i+16, j:j+16, k:k+16], pvs==0)
-                    valid_index = True
+            # This step is necessary to make sure the PVS is inside the ROI
+            if np.multiply(pvs>0, valid[i:i+16, j:j+16, k:k+16]).sum() == pvs.sum():
+                img[i:i+16, j:j+16, k:k+16] = 69*(pvs>0) + np.multiply(img[i:i+16, j:j+16, k:k+16], pvs==0)
 
         # Create the Nifti image
         affine = img_nii.affine                                                # Same affine transform
         header = img_nii.header                                                # Same header
 
         img_nifti = nib.Nifti1Image(img, affine, header)
-        nib.save(img_nifti, result_dir + 'image{}{}.nii.gz'.format(n, p))     # Create a file with same name and pvs_ as prefix
+        nib.save(img_nifti, result_dir + 'image{}{}.nii.gz'.format(n, p))      # Create a file with same name and pvs_ as prefix
