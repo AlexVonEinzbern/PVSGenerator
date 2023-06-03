@@ -99,7 +99,7 @@ class PVSAdder():
         self.atlas = None
         self.pvs = None
 
-    def addPVS(self, atlas, result_dir, n, p):
+    def addPVS(self, atlas, result_dir,p):
         img_nii = nib.load(atlas)
         img = img_nii.get_fdata()
         valid = ((img == 2)  |          # Lateral cerebral white matter
@@ -149,4 +149,4 @@ class PVSAdder():
         header = img_nii.header                                                # Same header
 
         img_nifti = nib.Nifti1Image(img, affine, header)
-        nib.save(img_nifti, result_dir + 'image{}{}.nii.gz'.format(n, p))      # Create a file with same name and pvs_ as prefix
+        nib.save(img_nifti, result_dir + 'image{}.nii.gz'.format(p))      # Create a file with same name and pvs_ as prefix
