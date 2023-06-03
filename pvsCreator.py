@@ -121,7 +121,7 @@ class PVSAdder():
                  (img == 58))           # Right accumbens
 
         # Get the indices of the regions of interest
-        indices = np.argwhere(valid)          # Right accumbens
+        indices = np.argwhere(valid)
 
         # Number of pvs between 20 and 100
         num_pvs = np.random.randint(low=20, high=100)
@@ -140,7 +140,7 @@ class PVSAdder():
             random_index = np.random.choice(len(indices))
             i, j, k = indices[random_index]
 
-            # This step is necessary to make sure the PVS is inside the ROI
+            # This step is necessary to make sure the PVS is inside the valid ROIs
             if np.multiply(pvs>0, valid[i:i+16, j:j+16, k:k+16]).sum() == pvs.sum():
                 img[i:i+16, j:j+16, k:k+16] = 69*(pvs>0) + np.multiply(img[i:i+16, j:j+16, k:k+16], pvs==0)
 
@@ -149,4 +149,4 @@ class PVSAdder():
         header = img_nii.header                                                # Same header
 
         img_nifti = nib.Nifti1Image(img, affine, header)
-        nib.save(img_nifti, result_dir + 'image{}.nii.gz'.format(p))      # Create a file with same name and pvs_ as prefix
+        nib.save(img_nifti, result_dir + 'image{}.nii.gz'.format(p))           # Create a file with same name and pvs_ as prefix
