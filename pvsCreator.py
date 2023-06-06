@@ -64,7 +64,10 @@ class PVSCreator():
     def rotatePVS(self):
         # Method that returns the PVS rotated
 
-        angles = np.random.randint(low=-20, high=20, size=3)
+        neg_angles = np.arange(-30, -4)                                        #Valid negative angles (-30, -5]
+        pos_angles = np.arange(5, 31)                                          #Valid positive angles [5, 30)
+
+        angles = np.random.choice(np.concatenate((neg_angles, pos_angles)), size=3, replace=False)
 
         # create a rotation object that rotates around the x-, y- and z-axis
         r_x = Rotation.from_euler('x', angles[0], degrees=True)
