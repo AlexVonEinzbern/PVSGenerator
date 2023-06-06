@@ -89,7 +89,7 @@ class PVSCreator():
         self.ax.set_xlabel('X')
         self.ax.set_ylabel('Y')
         self.ax.set_zlabel('Z')
-        self.ax.voxels(self.voxelarray, edgecolor='k')
+        self.ax.voxels(self.pvs_rotated, edgecolor='k')
         plt.show()
 
     # Return a numpy array
