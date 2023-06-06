@@ -50,7 +50,7 @@ class PVSCreator():
         cube4 = ((self.x > size4) & (self.x <= 2*size4) & (self.y > size4) & (self.y <= 2*size4) & (self.z >= size1+size2+size3) & 
                  (self.z <= size1+size2+size3+size4))
 
-        # # Combine the objects into a single boolean array
+        # Combine the objects into a single boolean array
         self.voxelarray = cube1 | cube2 | cube3 | cube4
 
         # Convert self.voxelarray to a float array
