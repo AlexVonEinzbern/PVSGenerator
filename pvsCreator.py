@@ -126,8 +126,9 @@ class PVSAdder():
         # Get the indices of the regions of interest
         indices = np.argwhere(valid)
 
-        # Number of pvs between 20 and 100
-        num_pvs = np.random.randint(low=20, high=100)
+        # Maximun number of pvs (due to the validations of pvs inside the ROIs
+        # part of the pvs will not be added)
+        num_pvs = 200
         
         for _ in range(num_pvs):
 
