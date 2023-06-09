@@ -61,6 +61,38 @@ class PVSCreator():
 
         self.sampling_points = np.column_stack([self.x.reshape(-1,1), self.y.reshape(-1,1), self.z.reshape(-1,1)])
 
+    ## Create a small PVS (Perivascular Space)
+    def createPVS2(self, NVox):
+        
+        # New -- from PSVDRO --
+        half_size = np.floor(NVox / 2)
+
+        self.x_vals = np.arange(-half_size[1], half_size[1])
+        self.y_vals = np.arange(-half_size[0], half_size[0])
+        self.z_vals = np.arange(-half_size[2], half_size[2])
+
+        # Prepare some coordenates
+        self.x, self.y, self.z = np.meshgrid(self.x_vals, self.y_vals, self.z_vals, indexing='ij')
+
+        # Params for cuboids
+        size1 = 2 # randint(1, 2)  # think of this as the cuboid size1
+        size2 = 2 # randint(1, 2)  # think of this as the cuboid size2
+
+        # Create 4 cuboids
+        cube1 = ((self.x > size1) & (self.x <= 2*size1) & (self.y > size1) & (self.y <= 2*size1) & (self.z <= size1))
+        cube2 = ((self.x > size2) & (self.x <= 2*size2) & (self.y > size2) & (self.y <= 2*size2) & (self.z > size1) & (self.z <= size1+size2))
+
+        # Combine the objects into a single boolean array
+        self.voxelarray = cube1 | cube2
+
+        # Convert self.voxelarray to a float array
+        self.voxelarray = self.voxelarray.astype(float)
+
+        self.interpolant = RegularGridInterpolator((self.x_vals, self.y_vals, self.z_vals), self.voxelarray, 
+                                                   method='linear', bounds_error=False, fill_value=0)
+
+        self.sampling_points = np.column_stack([self.x.reshape(-1,1), self.y.reshape(-1,1), self.z.reshape(-1,1)])
+
     def rotatePVS(self):
         # Method that returns the PVS rotated
 
@@ -84,12 +116,22 @@ class PVSCreator():
 
         self.pvs_rotated = pvs_rotated.reshape(self.x.shape)
 
+    # Plot the PVS rotated
     def plotPVS(self):
         self.ax = plt.figure().add_subplot(projection='3d')
         self.ax.set_xlabel('X')
         self.ax.set_ylabel('Y')
         self.ax.set_zlabel('Z')
         self.ax.voxels(self.pvs_rotated, edgecolor='k')
+        plt.show()
+
+    # Plot the voxelarray
+    def plotPVS2(self):
+        self.ax = plt.figure().add_subplot(projection='3d')
+        self.ax.set_xlabel('X')
+        self.ax.set_ylabel('Y')
+        self.ax.set_zlabel('Z')
+        self.ax.voxels(self.voxelarray, edgecolor='k')
         plt.show()
 
     # Return a numpy array
