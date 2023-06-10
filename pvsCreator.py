@@ -42,13 +42,26 @@ class PVSCreator():
         size4 = randint(1, 2)  # think of this as the cuboid size4
 
         # Create 4 cuboids
-        cube1 = ((self.x > size1) & (self.x <= 2*size1) & (self.y > size1) & (self.y <= 2*size1) & (self.z <= size1))
-        cube2 = ((self.x > size2) & (self.x <= 2*size2) & (self.y > size2) & (self.y <= 2*size2) & (self.z >= size1) & 
-                 (self.z <= size1+size2))
-        cube3 = ((self.x > size3) & (self.x <= 2*size3) & (self.y > size3) & (self.y <= 2*size3) & (self.z >= size1+size2) & 
-                 (self.z <= size1+size2+size3))
-        cube4 = ((self.x > size4) & (self.x <= 2*size4) & (self.y > size4) & (self.y <= 2*size4) & (self.z >= size1+size2+size3) & 
-                 (self.z <= size1+size2+size3+size4))
+        cube1 = (
+            (self.x > size1) & (self.x <= 2*size1) & 
+            (self.y > size1) & (self.y <= 2*size1) & 
+            (self.z <= size1)
+        )
+        cube2 = (
+            (self.x > size2) & (self.x <= 2*size2) & 
+            (self.y > size2) & (self.y <= 2*size2) & 
+            (self.z >= size1) & (self.z <= size1+size2)
+        )
+        cube3 = (
+            (self.x > size3) & (self.x <= 2*size3) & 
+            (self.y > size3) & (self.y <= 2*size3) & 
+            (self.z >= size1+size2) & (self.z <= size1+size2+size3)
+        )
+        cube4 = (
+            (self.x > size4) & (self.x <= 2*size4) & 
+            (self.y > size4) & (self.y <= 2*size4) & 
+            (self.z >= size1+size2+size3) & (self.z <= size1+size2+size3+size4)
+        )
 
         # Combine the objects into a single boolean array
         self.voxelarray = cube1 | cube2 | cube3 | cube4
@@ -75,12 +88,22 @@ class PVSCreator():
         self.x, self.y, self.z = np.meshgrid(self.x_vals, self.y_vals, self.z_vals, indexing='ij')
 
         # Params for cuboids
-        size1 = 2 # randint(1, 2)  # think of this as the cuboid size1
-        size2 = 2 # randint(1, 2)  # think of this as the cuboid size2
+        x_size = 2
+        y_size = 2
+        z_size = 2                                                                   
 
         # Create 4 cuboids
-        cube1 = ((self.x > size1) & (self.x <= 2*size1) & (self.y > size1) & (self.y <= 2*size1) & (self.z <= size1))
-        cube2 = ((self.x > size2) & (self.x <= 2*size2) & (self.y > size2) & (self.y <= 2*size2) & (self.z > size1) & (self.z <= size1+size2))
+        cube1 = (
+            (self.x > -x_size/2) & (self.x <= x_size/2) &
+            (self.y > -y_size/2) & (self.y <= y_size/2) &
+            (self.z > -z_size) & (self.z <= 0)
+        )
+
+        cube2 = (
+            (self.x > -x_size/2) & (self.x <= x_size/2) &
+            (self.y > -y_size/2) & (self.y <= y_size/2) &
+            (self.z > 0) & (self.z <= z_size)
+        )
 
         # Combine the objects into a single boolean array
         self.voxelarray = cube1 | cube2
@@ -92,6 +115,25 @@ class PVSCreator():
                                                    method='linear', bounds_error=False, fill_value=0)
 
         self.sampling_points = np.column_stack([self.x.reshape(-1,1), self.y.reshape(-1,1), self.z.reshape(-1,1)])
+
+        x_angle = np.random.choice([-10, 10])                                      #Search for a better way to do this
+        y_angle = np.random.choice([-40, 40])                                      #Search for a better way to do this
+        z_angle = np.random.choice([-10, 10])                                      #Search for a better way to do this
+
+        # create a rotation object that rotates around the x-, y- and z-axis
+        r_x = Rotation.from_euler('x', x_angle, degrees=True)
+        r_y = Rotation.from_euler('y', y_angle, degrees=True)
+        r_z = Rotation.from_euler('z', z_angle, degrees=True)
+
+        # combined
+        r = r_z * r_y * r_x
+        rotm = r.as_matrix()
+
+        sampling_points_rotated = np.dot(rotm, self.sampling_points.T)
+        pvs_rotated = self.interpolant(sampling_points_rotated.T)
+        pvs_rotated = pvs_rotated >= 0.5
+
+        self.pvs_rotated = pvs_rotated.reshape(self.x.shape)
 
     def rotatePVS(self):
         # Method that returns the PVS rotated
@@ -123,15 +165,6 @@ class PVSCreator():
         self.ax.set_ylabel('Y')
         self.ax.set_zlabel('Z')
         self.ax.voxels(self.pvs_rotated, edgecolor='k')
-        plt.show()
-
-    # Plot the voxelarray
-    def plotPVS2(self):
-        self.ax = plt.figure().add_subplot(projection='3d')
-        self.ax.set_xlabel('X')
-        self.ax.set_ylabel('Y')
-        self.ax.set_zlabel('Z')
-        self.ax.voxels(self.voxelarray, edgecolor='k')
         plt.show()
 
     # Return a numpy array
