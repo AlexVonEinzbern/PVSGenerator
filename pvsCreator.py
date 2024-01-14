@@ -36,10 +36,10 @@ class PVSCreator():
         self.x, self.y, self.z = np.meshgrid(self.x_vals, self.y_vals, self.z_vals, indexing='ij')
 
         # Params for cuboids
-        size1 = randint(1, 2)  # think of this as the cuboid size1
-        size2 = randint(1, 2)  # think of this as the cuboid size2
-        size3 = randint(1, 2)  # think of this as the cuboid size3
-        size4 = randint(1, 2)  # think of this as the cuboid size4
+        size1 = randint(2, 3)  # think of this as the cuboid size1
+        size2 = randint(2, 3)  # think of this as the cuboid size2
+        size3 = randint(2, 3)  # think of this as the cuboid size3
+        size4 = randint(2, 3)  # think of this as the cuboid size4
 
         # Create 4 cuboids
         cube1 = (
@@ -158,8 +158,16 @@ class PVSCreator():
 
         self.pvs_rotated = pvs_rotated.reshape(self.x.shape)
 
-    # Plot the PVS rotated
     def plotPVS(self):
+        self.ax = plt.figure().add_subplot(projection='3d')
+        self.ax.set_xlabel('X')
+        self.ax.set_ylabel('Y')
+        self.ax.set_zlabel('Z')
+        self.ax.voxels(self.voxelarray, edgecolor='k')
+        plt.show()
+
+    # Plot the PVS rotated
+    def plotPVS2(self):
         self.ax = plt.figure().add_subplot(projection='3d')
         self.ax.set_xlabel('X')
         self.ax.set_ylabel('Y')
